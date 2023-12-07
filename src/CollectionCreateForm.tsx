@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 
 //alias for data type
 interface Values {
-  id?: number;
+  id: number;
   title: string;
   tags: string;
   description: string;
@@ -14,7 +14,7 @@ interface CollectionCreateFormProps {
   onCreate: (values: Values) => void;
   onCancel: () => void;
   openModal: () => void;
-  editItem?: Values | null;
+  editItem: Values | null;
 }
 
 const CollectionCreateForm: React.FC<CollectionCreateFormProps> = ({

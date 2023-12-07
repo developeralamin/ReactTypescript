@@ -76,7 +76,10 @@ const App: React.FC = () => {
   // Handle modal form submit
   const handleModalCreate = (values: any) => {
     setIsModalVisible(false);
+    //when creatign new item
+    setEditItem(null);
     if (editItem) {
+      setLoading(true);
       // If editItem is present, it means we are editing an existing post
       axios
         .put(`http://127.0.0.1:8000/api/posts/${editItem.id}`, values)
@@ -86,6 +89,7 @@ const App: React.FC = () => {
           );
           setDataSource(updatedDataSource);
           message.success("Post updated successfully");
+          setLoading(false);
         })
         .catch((error) => {
           console.error("Error updating post:", error);
@@ -104,6 +108,8 @@ const App: React.FC = () => {
           };
           setDataSource((prevDataSource) => [...prevDataSource, newPost]);
           message.success("Post created successfully");
+          allPost();
+          setLoading(true);
         })
         .catch((error) => {
           console.error("Error creating post:", error);
