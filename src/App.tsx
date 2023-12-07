@@ -2,6 +2,7 @@ import { Button, Card, Col, Popconfirm, Table, message } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import CollectionCreateForm from "./CollectionCreateForm";
+import "./Style.scss";
 
 interface Item {
   id: number;
@@ -66,7 +67,7 @@ const App: React.FC = () => {
   // Handle modal visibility
   const handleModalClose = () => {
     setIsModalVisible(false);
-    setEditItem(null); // Clear the editItem when the modal is closed
+    setEditItem(null);
   };
   const openModal = () => {
     setIsModalVisible(true);
@@ -75,7 +76,6 @@ const App: React.FC = () => {
   // Handle modal form submit
   const handleModalCreate = (values: any) => {
     setIsModalVisible(false);
-
     if (editItem) {
       // If editItem is present, it means we are editing an existing post
       axios
@@ -110,11 +110,6 @@ const App: React.FC = () => {
           message.error("Failed to create post");
         });
     }
-  };
-
-  // Style
-  const cardStyle: React.CSSProperties = {
-    margin: "0 auto",
   };
 
   const columns = [
@@ -160,8 +155,8 @@ const App: React.FC = () => {
   ];
 
   return (
-    <Col span={12} style={cardStyle}>
-      <Card style={{ width: "100%" }}>
+    <Col className="cardStyle" span={12}>
+      <Card>
         <div>
           <CollectionCreateForm
             openModal={openModal}

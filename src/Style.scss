@@ -1,7 +1,12 @@
 // .onClick={() => handleEdit(record)}
 //  editItem={editItem}
-$dispaley: "flex";
+$dispaley: flex;
+$marignAuto: 0 auto;
 
 .Button {
   display: $dispaley;
+}
+
+.cardStyle {
+  margin: $marignAuto;
 }

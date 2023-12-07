@@ -1,13 +1,14 @@
 import { Button, Form, Input, Modal } from "antd";
 import React, { useEffect, useState } from "react";
 
+//alias for data type
 interface Values {
   id?: number;
   title: string;
   tags: string;
   description: string;
 }
-
+//receive props
 interface CollectionCreateFormProps {
   visible: boolean;
   onCreate: (values: Values) => void;
@@ -27,7 +28,6 @@ const CollectionCreateForm: React.FC<CollectionCreateFormProps> = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // If editItem is present, populate the form fields with its values
     if (editItem) {
       form.setFieldsValue({
         id: editItem.id,
@@ -36,7 +36,6 @@ const CollectionCreateForm: React.FC<CollectionCreateFormProps> = ({
         description: editItem.description,
       });
     } else {
-      // If no editItem, reset the form fields
       form.resetFields();
     }
   }, [editItem, form]);
@@ -63,8 +62,8 @@ const CollectionCreateForm: React.FC<CollectionCreateFormProps> = ({
       </Button>
       <Modal
         visible={visible}
-        title="Create a new post"
-        okText="Create"
+        title={editItem ? "Edit Item" : " Create Item"}
+        okText={editItem ? "Update" : "Create"}
         cancelText="Cancel"
         onCancel={onCancel}
         confirmLoading={loading}
