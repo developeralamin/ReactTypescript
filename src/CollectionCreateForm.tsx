@@ -1,8 +1,8 @@
 import { Button, Form, Input, Modal } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface Values {
-  id: number;
+  id?: number;
   title: string;
   tags: string;
   description: string;
@@ -13,6 +13,7 @@ interface CollectionCreateFormProps {
   onCreate: (values: Values) => void;
   onCancel: () => void;
   openModal: () => void;
+  editItem?: Values | null;
 }
 
 const CollectionCreateForm: React.FC<CollectionCreateFormProps> = ({
@@ -20,10 +21,27 @@ const CollectionCreateForm: React.FC<CollectionCreateFormProps> = ({
   onCreate,
   onCancel,
   openModal,
+  editItem,
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    // If editItem is present, populate the form fields with its values
+    if (editItem) {
+      form.setFieldsValue({
+        id: editItem.id,
+        title: editItem.title,
+        tags: editItem.tags,
+        description: editItem.description,
+      });
+    } else {
+      // If no editItem, reset the form fields
+      form.resetFields();
+    }
+  }, [editItem, form]);
+
+  //create and loading for button
   const handleCreate = async () => {
     try {
       setLoading(true);

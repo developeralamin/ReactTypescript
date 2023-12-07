@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const [dataSource, setDataSource] = useState<Item[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [editItem, setEditItem] = useState<Item | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -41,13 +42,11 @@ const App: React.FC = () => {
       });
   };
 
-  // Handle delete action\
+  // Handle delete action
   const handleDelete = (id: number) => {
     axios
       .delete(`http://127.0.0.1:8000/api/posts/${id}`)
       .then((response) => {
-        console.log("response");
-        console.log(response.data);
         const updatedDataSource = dataSource.filter((item) => item.id !== id);
         setDataSource(updatedDataSource);
         message.success("Post deleted successfully");
@@ -58,9 +57,16 @@ const App: React.FC = () => {
       });
   };
 
+  // Handle edit action
+  const handleEdit = (record: Item) => {
+    setEditItem(record);
+    setIsModalVisible(true);
+  };
+
   // Handle modal visibility
   const handleModalClose = () => {
     setIsModalVisible(false);
+    setEditItem(null); // Clear the editItem when the modal is closed
   };
   const openModal = () => {
     setIsModalVisible(true);
@@ -68,33 +74,45 @@ const App: React.FC = () => {
 
   // Handle modal form submit
   const handleModalCreate = (values: any) => {
-    console.log("Received values of form: ", values);
-    axios
-      .post("http://127.0.0.1:8000/api/posts", values)
-      .then((response) => {
-        console.log(response.data);
-        // Assuming the response contains the newly created post details
-        const newPost = {
-          id: response.data.id,
-          title: response.data.title,
-          tags: response.data.tags,
-          description: response.data.description,
-        };
-        // Update the dataSource state with the new post
-        setDataSource((prevDataSource) => [...prevDataSource, newPost]);
-        message.success("Post created successfully");
-        allPost();
-      })
-      .catch((error) => {
-        console.error("Error creating post:", error);
-        message.error("Failed to create post");
-      })
-      .finally(() => {
-        setIsModalVisible(false);
-      });
+    setIsModalVisible(false);
+
+    if (editItem) {
+      // If editItem is present, it means we are editing an existing post
+      axios
+        .put(`http://127.0.0.1:8000/api/posts/${editItem.id}`, values)
+        .then((response) => {
+          const updatedDataSource = dataSource.map((item) =>
+            item.id === editItem.id ? { ...item, ...values } : item
+          );
+          setDataSource(updatedDataSource);
+          message.success("Post updated successfully");
+        })
+        .catch((error) => {
+          console.error("Error updating post:", error);
+          message.error("Failed to update post");
+        });
+    } else {
+      // If editItem is not present, it means we are creating a new post
+      axios
+        .post("http://127.0.0.1:8000/api/posts", values)
+        .then((response) => {
+          const newPost = {
+            id: response.data.id,
+            title: response.data.title,
+            tags: response.data.tags,
+            description: response.data.description,
+          };
+          setDataSource((prevDataSource) => [...prevDataSource, newPost]);
+          message.success("Post created successfully");
+        })
+        .catch((error) => {
+          console.error("Error creating post:", error);
+          message.error("Failed to create post");
+        });
+    }
   };
 
-  //style
+  // Style
   const cardStyle: React.CSSProperties = {
     margin: "0 auto",
   };
@@ -124,14 +142,19 @@ const App: React.FC = () => {
       title: "Action",
       key: "action",
       render: (text: string, record: Item) => (
-        <Popconfirm
-          title="Are you sure you want to delete this post?"
-          onConfirm={() => handleDelete(record.id)}
-        >
-          <Button type="link" danger>
-            Delete
+        <div className="Button">
+          <Button type="primary" onClick={() => handleEdit(record)}>
+            Edit
           </Button>
-        </Popconfirm>
+          <Popconfirm
+            title="Are you sure you want to delete this post?"
+            onConfirm={() => handleDelete(record.id)}
+          >
+            <Button type="primary" danger>
+              Delete
+            </Button>
+          </Popconfirm>
+        </div>
       ),
     },
   ];
@@ -145,6 +168,7 @@ const App: React.FC = () => {
             visible={isModalVisible}
             onCreate={handleModalCreate}
             onCancel={handleModalClose}
+            editItem={editItem}
           />
           <Table bordered dataSource={dataSource} columns={columns} loading={loading} />
         </div>
